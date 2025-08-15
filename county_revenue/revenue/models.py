@@ -16,6 +16,7 @@ class Permit(models.Model):
     pdf_file = models.FileField(upload_to='permits/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return f"{self.permit_type} - {self.uid}"
 class Transaction(models.Model):

@@ -1,8 +1,5 @@
 from rest_framework import viewsets, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Permit
-from .serializers import PermitSerializer
-from django.shortcuts import render
 from .models import (
     Permit, Transaction, Property, ParkingZone, ParkingTicket,
     MarketStall, Advertisement, BuildingProject, AuditLog
@@ -18,6 +15,10 @@ class PermitViewSet(viewsets.ModelViewSet):
     queryset = Permit.objects.all()
     serializer_class = PermitSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['status', 'permit_type']
+    search_fields = ['uid']
+    ordering_fields = ['created_at', 'valid_to']
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -70,21 +71,8 @@ class BuildingProjectViewSet(viewsets.ModelViewSet):
     serializer_class = BuildingProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# AuditLog ViewSet
+# AuditLog ViewSet (Read Only for Admins)
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAdminUser]
-
-class PermitViewSet(viewsets.ModelViewSet):
-    queryset = Permit.objects.all()
-    serializer_class = PermitSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'permit_type']
-    search_fields = ['uid']
-    ordering_fields = ['created_at', 'valid_to']
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-

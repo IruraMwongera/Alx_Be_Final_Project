@@ -13,8 +13,15 @@ router.register(r'transactions', TransactionViewSet)
 
 urlpatterns = [
     path('', home_view, name='home'),
+
+    # Django admin
     path('admin/', admin.site.urls),
+
+    # API routes
     path('api/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls')),  # DRF's login/logout
-    path('users/', include('users.urls')),              # HTML auth routes
+    path('api-auth/', include('rest_framework.urls')),  # DRF login/logout
+
+    # HTML routes
+    path('users/', include('users.urls')),              # HTML for users app
+    path('revenue/', include('revenue.urls')),          # HTML for revenue app ✅
 ]

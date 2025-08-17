@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">My Parking Tickets</h2>
+
+    {% if tickets %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Plate Number</th>
+                    <th>Zone</th>
+                    <th>Duration</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.plate_number }}</td>
+                        <td>{{ ticket.zone.name }}</td>
+                        <td>
+                            {% if ticket.minutes %}{{ ticket.minutes }} mins{% endif %}
+                            {% if ticket.hours %} {{ ticket.hours }} hrs{% endif %}
+                            {% if ticket.days %} {{ ticket.days }} days{% endif %}
+                        </td>
+                        <td>Ksh {{ ticket.amount }}</td>
+                        <td>
+                            {% if ticket.paid %}
+                                <span class="badge bg-success">Paid</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Unpaid</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'parking_ticket_detail' ticket.pk %}" class="btn btn-sm btn-primary">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have not created any parking tickets yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

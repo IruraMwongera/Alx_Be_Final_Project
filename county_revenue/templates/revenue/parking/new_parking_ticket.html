@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">New Parking Ticket</h2>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Auto-filled details -->
+        <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
+            <p><span class="font-semibold text-gray-700">Town:</span> {{ town.name }}</p>
+            <p><span class="font-semibold text-gray-700">Area:</span> {{ area.name }}</p>
+        </div>
+
+        <!-- Render form fields from ParkingTicketForm -->
+        <div>
+            {{ form.non_field_errors }}
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                {{ form.vehicle.label_tag }}
+                {{ form.vehicle }}
+                {{ form.vehicle.errors }}
+            </div>
+
+            <div>
+                {{ form.section.label_tag }}
+                {{ form.section }}
+                {{ form.section.errors }}
+            </div>
+
+            <div>
+                {{ form.custom_section_name.label_tag }}
+                {{ form.custom_section_name }}
+                {{ form.custom_section_name.errors }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    {{ form.duration.label_tag }}
+                    {{ form.duration }}
+                    {{ form.duration.errors }}
+                </div>
+
+                <div>
+                    {{ form.time_unit.label_tag }}
+                    {{ form.time_unit }}
+                    {{ form.time_unit.errors }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition">
+                ✅ Create Ticket
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

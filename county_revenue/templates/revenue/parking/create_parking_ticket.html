@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Parking Ticket for {{ zone.name }}</h2>
+    <p><strong>Location:</strong> {{ zone.location }}</p>
+    <p><strong>Capacity:</strong> {{ zone.capacity }}</p>
+
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Create Ticket</button>
+    </form>
+
+    <hr>
+    <a href="{% url 'create_parking_ticket_by_area' area.id %}" class="btn btn-success">New Parking Ticket</a>
+
+
+</div>
+{% endblock %}
+

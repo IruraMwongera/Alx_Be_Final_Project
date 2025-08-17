@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    Permit, Transaction, Property, ParkingZone, ParkingTicket,
+    Permit, Transaction, Property, ParkingSection, ParkingTicket,
     MarketStall, Advertisement, BuildingProject, AuditLog
 )
 
@@ -22,11 +22,10 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['owner']
 
-class ParkingZoneSerializer(serializers.ModelSerializer):
+class ParkingSectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ParkingZone
+        model = ParkingSection
         fields = '__all__'
-
 class ParkingTicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParkingTicket

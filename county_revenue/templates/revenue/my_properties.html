@@ -29,7 +29,6 @@
             <td>
                 <a href="{% url 'property_detail' property.pk %}" class="btn btn-sm btn-info">View</a>
                 <a href="{% url 'edit_property' property.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                <a href="{% url 'delete_property' property.pk %}" class="btn btn-sm btn-danger">Delete</a>
             </td>
         </tr>
         {% endfor %}

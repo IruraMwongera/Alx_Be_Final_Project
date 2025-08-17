@@ -1,0 +1,11 @@
+<!-- revenue/parking_ticket_success.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>✅ Parking Ticket Created Successfully</h2>
+  <p>Your parking ticket has been created.</p>
+
+  <a href="{% url 'parking_ticket_detail_view' ticket.pk %}">
+    View Parking Ticket Details
+  </a>
+{% endblock %}

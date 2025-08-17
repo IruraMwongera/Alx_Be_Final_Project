@@ -2,52 +2,32 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import PropertyForm 
 from .forms import PermitForm
+from .models import Town, Area, ParkingSection, Vehicle, ParkingTicket
+from .forms import ParkingTicketForm
+from django.http import JsonResponse
+from .models import Town, Area
 from .models import (
-    Permit, Transaction, Property, ParkingZone, ParkingTicket,
+    Permit, Transaction, Property, ParkingTicket,
     MarketStall, Advertisement, BuildingProject, AuditLog
 )
 # --------------------
 # Permits
 # --------------------
-
 @login_required
 def create_permit(request):
     if request.method == 'POST':
         form = PermitForm(request.POST)
         if form.is_valid():
-            permit_instance = form.save(commit=False)
-            permit_instance.owner = request.user
-            permit_instance.save()
-            return redirect('success_page') 
+            permit = form.save(commit=False)
+            permit.owner = request.user  # Set the logged-in user as owner
+            permit.save()
+            return redirect('new_permit')  # Or redirect to a detail page if needed
     else:
-        form = PermitForm()
-    
-    # We now render to a different template name to avoid confusion
-    return render(request, 'revenue/new_permit.html', {'form': form})
-@login_required
-def update_permit(request, uid):
-    permit = get_object_or_404(Permit, uid=uid, owner=request.user)
+        form = PermitForm()  # GET request shows empty form
 
-    if request.method == 'POST':
-        # Instantiate the form with POST data and the existing object
-        form = PermitForm(request.POST, instance=permit)
-        if form.is_valid():
-            form.save() # The form's save method handles the JSONField update
-            return redirect('permit_detail_view', uid=permit.uid)
-    else:
-        # Pre-populate the form with data from the JSONField for the custom fields
-        initial_data = {
-            'permit_type': permit.permit_type,
-            'business_name': permit.data.get('business_name'),
-            'business_type': permit.data.get('business_type'),
-            'project_name': permit.data.get('project_name'),
-            'project_address': permit.data.get('project_address'),
-            'license_type': permit.data.get('license_type'),
-            'premises_address': permit.data.get('premises_address'),
-        }
-        form = PermitForm(instance=permit, initial=initial_data)
-
-    return render(request, 'update_permit.html', {'form': form, 'permit': permit})
+    return render(request, 'revenue/new_permit.html', {
+        'form': form,
+    })
 @login_required
 def permit_success_view(request):
     return render(request, 'revenue/permit_success.html')
@@ -90,7 +70,22 @@ def my_properties_view(request):
 def property_detail_view(request, pk):
     property_obj = get_object_or_404(Property, pk=pk, owner=request.user)
     return render(request, 'revenue/property_detail.html', {'property': property_obj})
-
+@login_required
+def edit_property(request, pk):
+    property_obj = get_object_or_404(Property, pk=pk, owner=request.user)
+    
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, instance=property_obj)
+        if form.is_valid():
+            form.save()
+            return redirect('my_properties')
+    else:
+        form = PropertyForm(instance=property_obj)
+    
+    return render(request, 'revenue/edit_property.html', {
+        'form': form,
+        'property': property_obj
+    })
 # --------------------
 # Transactions
 # --------------------
@@ -104,31 +99,122 @@ def transaction_detail_view(request, pk):
     transaction = get_object_or_404(Transaction, pk=pk, owner=request.user)
     return render(request, 'revenue/transaction_detail.html', {'transaction': transaction})
 
+
 # --------------------
-# Parking Zones
+# API for Parking Tickets
+# --------------------
+def api_areas(request, town_id):
+    areas = Area.objects.filter(town_id=town_id).values("id", "name")
+    return JsonResponse({"areas": list(areas)})
+
+
+def api_sections(request, area_id):
+    sections = ParkingSection.objects.filter(area_id=area_id).values("id", "name")
+    return JsonResponse({"sections": list(sections)})
+
+
+def api_towns(request):
+    towns = Town.objects.all().values("id", "name")
+    return JsonResponse(list(towns), safe=False)
+
+
+def api_areas_by_town(request, town_id):
+    areas = Area.objects.filter(town_id=town_id).values("id", "name")
+    return JsonResponse(list(areas), safe=False)
+
+
+def api_section_details(request, section_id):
+    section = get_object_or_404(ParkingSection, id=section_id)
+    return JsonResponse({
+        "id": section.id,
+        "name": section.name,
+        "area": section.area.name,
+        "town": section.area.town.name,
+    })
+# --------------------
+# Parking Sections (formerly "Zones")
 # --------------------
 @login_required
 def parking_zones_view(request):
-    zones = ParkingZone.objects.all()
-    return render(request, 'revenue/parking_zones.html', {'zones': zones})
+    zones = ParkingSection.objects.all()
+    return render(request, 'revenue/parking/parking_zones.html', {'zones': zones})
+
 
 @login_required
 def parking_zone_detail_view(request, pk):
-    zone = get_object_or_404(ParkingZone, pk=pk)
-    return render(request, 'revenue/parking_zone_detail.html', {'zone': zone})
+    zone = get_object_or_404(ParkingSection, pk=pk)
+    
+    # Show all tickets in this section for this user
+    tickets = ParkingTicket.objects.filter(section=zone, vehicle__owner=request.user)
 
+    return render(request, 'revenue/parking/parking_zone_detail.html', {
+        'zone': zone,
+        'tickets': tickets
+    })
 # --------------------
 # Parking Tickets
 # --------------------
 @login_required
-def my_parking_tickets_view(request):
-    tickets = ParkingTicket.objects.filter(owner=request.user)
-    return render(request, 'revenue/my_parking_tickets.html', {'tickets': tickets})
+def create_parking_ticket_view(request, area_id):
+    area = get_object_or_404(Area, pk=area_id)
+    town = area.town
+
+    if request.method == "POST":
+        form = ParkingTicketForm(request.POST, user=request.user, area=area)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            section = form.cleaned_data.get("section")
+            custom_section_name = form.cleaned_data.get("custom_section_name")
+
+            # Handle custom section
+            if not section and custom_section_name:
+                section, created = ParkingSection.objects.get_or_create(
+                    area=area,
+                    name=custom_section_name,
+                    defaults={"is_custom": True, "capacity": 1}
+                )
+
+            ticket.section = section
+            ticket.save()
+            return redirect("parking_ticket_detail_view", pk=ticket.pk)
+    else:
+        form = ParkingTicketForm(user=request.user, area=area)
+
+    return render(request, "revenue/parking/new_parking_ticket.html", {
+        "form": form,
+        "area": area,
+        "town": town,
+    })
+@login_required    
+def parking_ticket_success_view(request, pk):
+    ticket = get_object_or_404(
+        ParkingTicket,
+        pk=pk,
+        vehicle__owner=request.user
+    )
+    return render(request, "revenue/parking/new_parking_ticket.html", {"ticket": ticket})
 
 @login_required
+def my_parking_tickets_view(request):
+    tickets = ParkingTicket.objects.filter(vehicle__owner=request.user)
+    return render(request, 'revenue/parking/my_parking_tickets.html', {'tickets': tickets})
+@login_required
 def parking_ticket_detail_view(request, pk):
-    ticket = get_object_or_404(ParkingTicket, pk=pk, owner=request.user)
-    return render(request, 'revenue/parking_ticket_detail.html', {'ticket': ticket})
+    ticket = get_object_or_404(ParkingTicket, pk=pk, vehicle__owner=request.user)
+    
+    # Assuming your ParkingTicket model has foreign keys to section, area, town
+    section = ticket.section
+    area = section.area
+    town = area.town
+    
+    context = {
+        'ticket': ticket,
+        'section': section,
+        'area': area,
+        'town': town,
+    }
+    
+    return render(request, 'revenue/parking/parking_ticket_detail.html', context)
 
 # --------------------
 # Market Stalls
@@ -185,3 +271,4 @@ def audit_log_detail_view(request, pk):
         return render(request, '403.html', status=403)
     log = get_object_or_404(AuditLog, pk=pk)
     return render(request, 'revenue/audit_log_detail.html', {'log': log})
+

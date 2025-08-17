@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Parking Zones</h2>
+    <p>Select a zone to view details and create a parking ticket.</p>
+
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+    <thead>
+        <tr>
+            <th>Parking Section</th>
+            <th>Town</th>
+            <th>Area</th>
+            <th>Capacity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for zone in zones %}
+        <tr>
+            <td>{{ zone.name }}</td>
+            <td>{{ zone.area.town.name }}</td>
+            <td>{{ zone.area.name }}</td>
+            <td>{{ zone.capacity }}</td>
+            <td>
+              <a href="{% url 'parking_zone_detail' zone.id %}" class="btn btn-sm btn-primary">
+                        View Details
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No parking zones available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

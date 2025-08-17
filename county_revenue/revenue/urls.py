@@ -10,13 +10,12 @@ router = DefaultRouter()
 router.register('permits', views.PermitViewSet)
 router.register('transactions', views.TransactionViewSet)
 router.register('properties', views.PropertyViewSet)
-router.register('parking-zones', views.ParkingZoneViewSet)
+router.register('parking-sections', views.ParkingSectionViewSet)  # updated
 router.register('parking-tickets', views.ParkingTicketViewSet)
 router.register('market-stalls', views.MarketStallViewSet)
 router.register('advertisements', views.AdvertisementViewSet)
 router.register('building-projects', views.BuildingProjectViewSet)
 router.register('audit-logs', views.AuditLogViewSet)
-
 # --------------------
 # URL Patterns
 # --------------------
@@ -35,6 +34,8 @@ urlpatterns = [
     path('my-properties/', views_html.my_properties_view, name='my_properties'),
     path('property/<int:pk>/', views_html.property_detail_view, name='property_detail'),
     path('properties/new/', views_html.new_property_view, name='new_property'),
+    path('properties/<int:pk>/edit/', views_html.edit_property, name='edit_property'),
+
 
     # HTML views - Transactions
     path('my-transactions/', views_html.my_transactions_view, name='my_transactions'),
@@ -61,6 +62,33 @@ urlpatterns = [
     # HTML views - Audit Logs
     path('audit-logs/', views_html.audit_logs_view, name='audit_logs'),
     path('audit-log/<int:pk>/', views_html.audit_log_detail_view, name='audit_log_detail'),
+    # HTML views - Parking
+    path('parking-zones/', views_html.parking_zones_view, name='parking_zones'),
+    path('parking-zone/<int:pk>/', views_html.parking_zone_detail_view, name='parking_zone_detail'),
+
+    path('my-parking-tickets/', views_html.my_parking_tickets_view, name='my_parking_tickets'),
+    path('parking-ticket/<int:pk>/', views_html.parking_ticket_detail_view, name='parking_ticket_detail_view'),
+
+    path("api/section/<int:section_id>/", views_html.api_section_details, name="api_section_details"),
+    path("api/towns/", views_html.api_towns, name="api_towns"),
+    path("api/areas/<int:town_id>/", views_html.api_areas_by_town, name="api_areas_by_town"),
+
+
+    # --- API endpoints for dropdowns ---
+    path('revenue/create-ticket/<int:area_id>/', views_html.create_parking_ticket_view, name='create_parking_ticket'),
+    path('parking-ticket/<int:pk>/success/', views_html.parking_ticket_success_view, name='parking_ticket_success_view'),
+    path('api/sections/<int:area_id>/', views_html.api_sections, name='api_sections'),
+
+    path("ajax/load-areas/", views.load_areas, name="ajax_load_areas"),
+    path("ajax/load-sections/", views.load_sections, name="ajax_load_sections"),
+
+    # --- Include DRF router URLs ---
+    path('api/', include(router.urls)),
 ]
+
+
+
+   
+ 
 
 

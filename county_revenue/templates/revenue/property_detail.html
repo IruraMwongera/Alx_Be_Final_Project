@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Property Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ property.name }}</h2>
+    <p><strong>Lr Number:</strong> {{ property.LrNumber}}</p>
+    <p><strong>Location:</strong> {{ property.location }}</p>
+    <p><strong>Value:</strong> {{ property.valuation }}</p>
+    <p><strong>ARREARS:</strong> {{ property.ARREARS }}</p>
+
+    <a href="{% url 'edit_property' property.pk %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'my_properties' %}" class="btn btn-secondary">Back to My Properties</a>
+</div>
+{% endblock %}

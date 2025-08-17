@@ -1,13 +1,14 @@
+
+from django.http import JsonResponse
 from rest_framework import viewsets, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import (
-    Permit, Transaction, Property, ParkingZone, ParkingTicket,
-    MarketStall, Advertisement, BuildingProject, AuditLog
+    Permit, Transaction, Property, ParkingTicket,ParkingSection,Area,
+   MarketStall, Advertisement, BuildingProject, AuditLog
 )
 from .serializers import (
-    PermitSerializer, TransactionSerializer, PropertySerializer,
-    ParkingZoneSerializer, ParkingTicketSerializer, MarketStallSerializer,
-    AdvertisementSerializer, BuildingProjectSerializer, AuditLogSerializer
+    PermitSerializer, TransactionSerializer, PropertySerializer,  ParkingTicketSerializer, MarketStallSerializer,
+    AdvertisementSerializer, BuildingProjectSerializer, AuditLogSerializer,ParkingSectionSerializer
 )
 
 # Permit ViewSet
@@ -40,13 +41,10 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-# ParkingZone ViewSet
-class ParkingZoneViewSet(viewsets.ModelViewSet):
-    queryset = ParkingZone.objects.all()
-    serializer_class = ParkingZoneSerializer
+class ParkingSectionViewSet(viewsets.ModelViewSet):
+    queryset = ParkingSection.objects.all()
+    serializer_class = ParkingSectionSerializer
     permission_classes = [permissions.IsAuthenticated]
-
 # ParkingTicket ViewSet
 class ParkingTicketViewSet(viewsets.ModelViewSet):
     queryset = ParkingTicket.objects.all()
@@ -76,3 +74,13 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer
     permission_classes = [permissions.IsAdminUser]
+def load_areas(request):
+    town_id = request.GET.get("town")
+    areas = Area.objects.filter(town_id=town_id).values("id", "name")
+    return JsonResponse(list(areas), safe=False)
+
+def load_sections(request):
+    area_id = request.GET.get("area")
+    sections = ParkingSection.objects.filter(area_id=area_id).values("id", "name")
+    return JsonResponse(list(sections), safe=False)
+

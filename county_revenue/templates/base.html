@@ -21,10 +21,13 @@
                 <div class="nav-links">
                     {% if user.is_authenticated %}
                         <a href="{% url 'my_permits' %}" class="nav-link">My Permits</a>
+                        <a href="{% url 'my_permits' %}" class="nav-link">My Permits</a>
                         <a href="{% url 'my_properties' %}" class="nav-link">My Properties</a>
                         <a href="{% url 'my_transactions' %}" class="nav-link">My Transactions</a>
                         <a href="{% url 'profile' %}" class="nav-link">{{ user.username }}</a>
                         <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+                        <a href="{% url 'parking_zones' %}" class="nav-link">Parking Zones</a>
+                        <a href="{% url 'my_parking_tickets' %}" class="nav-link">my_parking_tickets</a>
                     {% else %}
                         <a href="{% url 'login' %}" class="nav-link">Login</a>
                         <a href="{% url 'register' %}" class="nav-link">Register</a>

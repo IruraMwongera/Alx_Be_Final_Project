@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="text-align: center; margin-top: 50px;">
+    <h2>✅ Permit Successfully {% if action %}{{ action }}{% else %}Created{% endif %}</h2>
+    <p>Permit Number: <strong>{{ permit.permit_number }}</strong></p>
+    <p>Owner Name: <strong>{{ permit.owner.get_full_name|default:permit.owner.username }}</strong></p>
+    <p>Permit Type: <strong>{{ permit.permit_type.name }}</strong></p>
+    <p>Start Date: <strong>{{ permit.start_date }}</strong></p>
+    <p>End Date: <strong>{{ permit.end_date }}</strong></p>
+    {% if permit.permit_type.is_daily %}
+        <p>Duration: <strong>{{ permit.duration_days }} day{% if permit.duration_days|pluralize %}s{% endif %}</strong></p>
+    {% endif %}
+    <p>Total Fee: <strong>KSh {{ permit.total_fee }}</strong></p>
+    <p>Paid: <strong>{% if permit.paid %}✅ Yes{% else %}❌ No{% endif %}</strong></p>
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'permit_list' %}" class="btn">Back to Permits List</a>
+        <a href="{% url 'permit_create' %}" class="btn">Create Another Permit</a>
+    </div>
+</div>
+{% endblock %}

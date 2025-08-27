@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Parking Ticket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+        .header p {
+            margin: 2px 0;
+            font-size: 11px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            text-align: left;
+            padding: 6px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            width: 40%;
+            font-weight: bold;
+        }
+        td {
+            width: 60%;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 11px;
+            border-top: 1px dashed #000;
+            padding-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>County Government</h1>
+        <p>Parking Ticket Receipt</p>
+    </div>
+
+    <table>
+        <tr>
+            <th>Ticket Number</th>
+            <td>{{ ticket.id }}</td>
+        </tr>
+        <tr>
+            <th>Town</th>
+            <td>{{ ticket.town_name }}</td>
+        </tr>
+        <tr>
+            <th>Area</th>
+            <td>{{ ticket.area_name }}</td>
+        </tr>
+        <tr>
+            <th>Section</th>
+            <td>{{ ticket.section.name }}</td>
+        </tr>
+        <tr>
+            <th>Plate Number</th>
+            <td>{{ ticket.plate_number }}</td>
+        </tr>
+        <tr>
+            <th>Duration</th>
+            <td>{{ ticket.duration }} {{ ticket.time_unit }}</td>
+        </tr>
+        <tr>
+            <th>Amount</th>
+            <td>KSh {{ ticket.amount }}</td>
+        </tr>
+        <tr>
+            <th>Paid</th>
+            <td>{% if ticket.paid %}✔ Yes{% else %}❌ No{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Issued On</th>
+            <td>{{ ticket.created_at|date:"M d, Y H:i" }}</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <p>Thank you for using County Parking Services</p>
+        <p>Retain this ticket as proof of payment</p>
+    </div>
+</body>
+</html>

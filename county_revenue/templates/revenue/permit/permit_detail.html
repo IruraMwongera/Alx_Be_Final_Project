@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Permit Details</h2>
+
+<table>
+    <tr>
+        <th>Permit Number</th>
+        <td>{{ permit.permit_number }}</td>
+    </tr>
+    <tr>
+        <th>Owner Name</th>
+        <td>{{ permit.owner_name }}</td>
+    </tr>
+    <tr>
+        <th>Permit Type</th>
+        <td>{{ permit.permit_type.name }}</td>
+    </tr>
+    <tr>
+        <th>Start Date</th>
+        <td>{{ permit.start_date }}</td>
+    </tr>
+    <tr>
+        <th>End Date</th>
+        <td>{{ permit.end_date }}</td>
+    </tr>
+
+    {# Show duration only for daily permits #}
+    {% if permit.permit_type.is_daily %}
+    <tr>
+        <th>Duration (Days)</th>
+        <td>{{ permit.duration_days }}</td>
+    </tr>
+    {% endif %}
+
+    <tr>
+        <th>Total Fee</th>
+        <td>KSh {{ permit.total_fee }}</td>
+    </tr>
+    <tr>
+        <th>Amount Paid</th>
+        <td>KSh {{ permit.amount_paid }}</td>
+    </tr>
+    <tr>
+        <th>Paid</th>
+        <td>{% if permit.paid %}✅ Yes{% else %}❌ No{% endif %}</td>
+    </tr>
+    <tr>
+        <th>Notes</th>
+        <td>{{ permit.notes|default:"-" }}</td>
+    </tr>
+</table>
+
+<a href="{% url 'permit_edit' permit.id %}">Edit Permit</a> |
+<a href="{% url 'permit_list' %}">Back to Permit List</a>
+<a href="{% url 'generate_permit_pdf' permit.id %}" 
+   class="btn btn-primary" 
+   target="_blank">
+   Download PDF Receipt
+</a>
+{% endblock %}

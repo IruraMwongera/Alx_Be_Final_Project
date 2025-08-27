@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>New Permit</h2>
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Permit Type -->
+    <div class="mb-3">
+      <label for="{{ form.permit_type.id_for_label }}" class="form-label">Permit Type</label>
+      {{ form.permit_type }}
+    </div>
+
+    <!-- Owner Name -->
+    <div class="mb-3">
+      <label for="{{ form.owner_name.id_for_label }}" class="form-label">Owner Name</label>
+      {{ form.owner_name }}
+    </div>
+
+    <!-- Start Date -->
+    <div class="mb-3">
+      <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+      {{ form.start_date }}
+    </div>
+
+    <!-- Duration Days (Special Event) -->
+    <div id="daysField" class="mb-3">
+      <label for="{{ form.duration_days.id_for_label }}" class="form-label">Number of Days</label>
+      {{ form.duration_days }}
+    </div>
+
+    <!-- Duration Months (Hawking) -->
+    <div id="monthsField" class="mb-3">
+      <label for="{{ form.duration_months.id_for_label }}" class="form-label">Number of Months</label>
+      {{ form.duration_months }}
+    </div>
+
+    <!-- Total Fee -->
+    <div class="mb-3">
+      <label for="id_total_fee" class="form-label">Total Fee</label>
+      <input type="text" id="id_total_fee" class="form-control" value="Will be calculated on save" readonly>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+
+<script>
+  const permitTypeSelect = document.getElementById("id_permit_type");
+  const daysField = document.getElementById("daysField");
+  const monthsField = document.getElementById("monthsField");
+
+  function toggleFields() {
+    const selectedOption = permitTypeSelect.options[permitTypeSelect.selectedIndex];
+    if (!selectedOption) return;
+
+    const selectedText = selectedOption.text.toLowerCase().trim();
+
+    if (selectedText.includes("special event")) {
+      daysField.style.display = "block";
+      monthsField.style.display = "none";
+      document.getElementById("id_duration_days").style.display = "block";
+    } else if (selectedText.includes("hawking")) {
+      daysField.style.display = "none";
+      monthsField.style.display = "block";
+      document.getElementById("id_duration_months").style.display = "block"; // force input visible
+    } else {
+      daysField.style.display = "none";
+      monthsField.style.display = "none";
+    }
+  }
+
+  permitTypeSelect.addEventListener("change", toggleFields);
+
+  // Run once on page load to set the initial state
+  toggleFields();
+</script>
+{% endblock %}

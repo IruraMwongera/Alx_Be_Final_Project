@@ -4,18 +4,21 @@
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8">
 
-    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">🚗 Parking Ticket Details</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center"> Parking Ticket Details</h2>
 
     <!-- Location Info -->
     <div class="bg-gray-100 p-4 rounded-lg shadow-sm mb-4">
-        <p><span class="font-semibold text-gray-700">Town:</span> {{ town.name }}</p>
-        <p><span class="font-semibold text-gray-700">Area:</span> {{ area.name }}</p>
-        <p><span class="font-semibold text-gray-700">Section:</span> {{ section.name }}</p>
+        <p><span class="font-semibold text-gray-700">Town:</span> {{ ticket.town_name }}</p>
+        <p><span class="font-semibold text-gray-700">Area:</span> {{ ticket.area_name }}</p>
+        <p><span class="font-semibold text-gray-700">Section:</span> {{ ticket.section.name }}</p>
+        {% if ticket.custom_place %}
+            <p><span class="font-semibold text-gray-700">Custom Place:</span> {{ ticket.custom_place }}</p>
+        {% endif %}
     </div>
 
-    <!-- Ticket Info -->
+    <!-- Vehicle & Ticket Info -->
     <p><strong>Plate Number:</strong> {{ ticket.plate_number }}</p>
-    <p><strong>Vehicle Type:</strong> {{ ticket.get_vehicle_type_display }}</p>
+    <p><strong>Vehicle Type:</strong> {{ ticket.vehicle_type|capfirst }}</p>
     <p><strong>Duration:</strong> {{ ticket.duration }} {{ ticket.get_time_unit_display }}</p>
     <p><strong>Amount:</strong> KSh {{ ticket.amount }}</p>
     <p><strong>Paid:</strong> {% if ticket.paid %} ✅ Yes {% else %} ❌ No {% endif %}</p>
@@ -24,6 +27,13 @@
         <p><strong>Transaction ID:</strong> {{ ticket.transaction.id }}</p>
     {% endif %}
 
+    <p><strong>Created On:</strong> {{ ticket.created_at|date:"M d, Y H:i" }}</p>
+    <a href="{% url 'ticket_pdf' ticket.id %}" target="_blank">Download PDF</a>
 </div>
 {% endblock %}
+
+
+
+
+
 

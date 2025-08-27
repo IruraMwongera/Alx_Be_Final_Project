@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Permit Receipt - {{ permit.permit_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            font-size: 13px;
+            color: #333;
+        }
+        .receipt-box {
+            border: 2px solid #000;
+            padding: 20px;
+            max-width: 700px;
+            margin: auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 18px;
+        }
+        .info {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .info td {
+            padding: 4px 6px;
+            font-size: 13px;
+            vertical-align: top;
+        }
+        .details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .details th, .details td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        .details th {
+            background: #f2f2f2;
+            text-align: left;
+        }
+        .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+        .description {
+            min-height: 20px;
+            vertical-align: top;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 11px;
+        }
+        .paid {
+            color: green;
+            font-weight: bold;
+        }
+        .unpaid {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-box">
+        <div class="header">
+            <h2>County Revenue Department</h2>
+            <p>Official Permit Receipt</p>
+        </div>
+
+        <table class="info">
+            <tr>
+                <td><strong>Receipt No:</strong> {{ permit.permit_number }}</td>
+                <td><strong>Owner Name:</strong> {{ permit.owner_name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Permit Type:</strong> {{ permit_type_display }}</td>
+                <td>
+                    <strong>Validity:</strong> 
+                    {{ start_date_display }} – {{ end_date_display }}
+                </td>
+            </tr>
+        </table>
+
+        <table class="details">
+            <tr>
+                <th>Description</th>
+                <th>Amount (KSh)</th>
+            </tr>
+            <tr>
+                <td class="description">Permit Fee</td>
+                <td class="amount">{{ permit.total_fee }}</td>
+            </tr>
+            <tr>
+                <td class="description">Amount Paid</td>
+                <td class="amount">{{ permit.amount_paid }}</td>
+            </tr>
+            <tr>
+                <td class="description">Balance</td>
+                <td class="amount">{{ permit.balance }}</td>
+            </tr>
+        </table>
+
+        <p style="margin-top:15px;">
+            Payment Status:
+            {% if permit.is_paid %}
+                <span class="paid">✔ Paid in Full</span>
+            {% else %}
+                <span class="unpaid">✘ Not Fully Paid</span>
+            {% endif %}
+        </p>
+
+        <div class="footer">
+            <p>Thank you for your payment.<br>
+               County Revenue System © {{ permit.start_date|date:"Y" }}</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,94 +1,30 @@
-# revenue/urls.py
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from . import views, views_html
+from django.urls import path
+from . import views_html
 
-# --------------------
-# DRF API Router
-# --------------------
-router = DefaultRouter()
-router.register('permits', views.PermitViewSet)
-router.register('transactions', views.TransactionViewSet)
-router.register('properties', views.PropertyViewSet)
-router.register('parking-sections', views.ParkingSectionViewSet)  # updated
-router.register('parking-tickets', views.ParkingTicketViewSet)
-router.register('market-stalls', views.MarketStallViewSet)
-router.register('advertisements', views.AdvertisementViewSet)
-router.register('building-projects', views.BuildingProjectViewSet)
-router.register('audit-logs', views.AuditLogViewSet)
-# --------------------
-# URL Patterns
-# --------------------
 urlpatterns = [
-    # API endpoints
-    path('api/', include(router.urls)),
-
-    # HTML views - Permits
-    path('new-permit/', views_html.create_permit, name='new_permit'),
-    path('my-permits/', views_html.my_permits_view, name='my_permits'),
-    path('pay-mpesa/<int:permit_id>/', views_html.pay_mpesa, name='pay_mpesa'),
-    path('permit-success/', views_html.permit_success_view, name='success_page'),
-    path('permit/<uuid:uid>/', views_html.permit_detail_view, name='permit_detail'),
-
-    # HTML views - Properties
-    path('my-properties/', views_html.my_properties_view, name='my_properties'),
-    path('property/<int:pk>/', views_html.property_detail_view, name='property_detail'),
-    path('properties/new/', views_html.new_property_view, name='new_property'),
-    path('properties/<int:pk>/edit/', views_html.edit_property, name='edit_property'),
+    # ---------------- Permits ----------------
+    path("permits/", views_html.permit_list, name="permit_list"),
+    path("permits/new/", views_html.create_permit, name="permit_create"),
+    path("permits/<int:permit_id>/", views_html.permit_detail, name="permit_detail"),
+    path("permits/success/<int:permit_id>/", views_html.permit_success, name="permit_success"),
+    path("permits/<int:permit_id>/edit/", views_html.permit_edit, name="permit_edit"),
+    path("permits/<int:permit_id>/pdf/", views_html.generate_permit_pdf, name="generate_permit_pdf"),
 
 
-    # HTML views - Transactions
-    path('my-transactions/', views_html.my_transactions_view, name='my_transactions'),
-    path('transaction/<int:pk>/', views_html.transaction_detail_view, name='transaction_detail'),
 
-    # HTML views - Parking
-    path('parking-zones/', views_html.parking_zones_view, name='parking_zones'),
-    path('parking-zone/<int:pk>/', views_html.parking_zone_detail_view, name='parking_zone_detail'),
-    path('my-parking-tickets/', views_html.my_parking_tickets_view, name='my_parking_tickets'),
-    path('parking-ticket/<int:pk>/', views_html.parking_ticket_detail_view, name='parking_ticket_detail'),
+    # ---------------- Parking ----------------
+    path("parking-zones/", views_html.parking_zones_view, name="parking_zones"),
+    path("parking-zone/<int:pk>/", views_html.parking_zone_detail_view, name="parking_zone_detail"),
+    path("my-parking-tickets/", views_html.my_parking_tickets_view, name="my_parking_tickets"),
+    path("parking-ticket/<int:pk>/", views_html.parking_ticket_detail_view, name="parking_ticket_detail"),
+    path("ticket/new/<int:section_id>/", views_html.create_parking_ticket_view, name="create_ticket"),
+    path("ticket/<int:ticket_id>/pdf/", views_html.generate_ticket_pdf, name="ticket_pdf"),
 
-    # HTML views - Market Stalls
-    path('my-market-stalls/', views_html.my_market_stalls_view, name='my_market_stalls'),
-    path('market-stall/<int:pk>/', views_html.market_stall_detail_view, name='market_stall_detail'),
-
-    # HTML views - Advertisements
-    path('my-advertisements/', views_html.my_advertisements_view, name='my_advertisements'),
-    path('advertisement/<int:pk>/', views_html.advertisement_detail_view, name='advertisement_detail'),
-
-    # HTML views - Building Projects
-    path('my-building-projects/', views_html.my_building_projects_view, name='my_building_projects'),
-    path('building-project/<int:pk>/', views_html.building_project_detail_view, name='building_project_detail'),
-
-    # HTML views - Audit Logs
-    path('audit-logs/', views_html.audit_logs_view, name='audit_logs'),
-    path('audit-log/<int:pk>/', views_html.audit_log_detail_view, name='audit_log_detail'),
-    # HTML views - Parking
-    path('parking-zones/', views_html.parking_zones_view, name='parking_zones'),
-    path('parking-zone/<int:pk>/', views_html.parking_zone_detail_view, name='parking_zone_detail'),
-
-    path('my-parking-tickets/', views_html.my_parking_tickets_view, name='my_parking_tickets'),
-    path('parking-ticket/<int:pk>/', views_html.parking_ticket_detail_view, name='parking_ticket_detail_view'),
-
-    path("api/section/<int:section_id>/", views_html.api_section_details, name="api_section_details"),
+    # ---------------- API / AJAX ----------------
     path("api/towns/", views_html.api_towns, name="api_towns"),
     path("api/areas/<int:town_id>/", views_html.api_areas_by_town, name="api_areas_by_town"),
-
-
-    # --- API endpoints for dropdowns ---
-    path('revenue/create-ticket/<int:area_id>/', views_html.create_parking_ticket_view, name='create_parking_ticket'),
-    path('parking-ticket/<int:pk>/success/', views_html.parking_ticket_success_view, name='parking_ticket_success_view'),
-    path('api/sections/<int:area_id>/', views_html.api_sections, name='api_sections'),
-
-    path("ajax/load-areas/", views.load_areas, name="ajax_load_areas"),
-    path("ajax/load-sections/", views.load_sections, name="ajax_load_sections"),
-
-    # --- Include DRF router URLs ---
-    path('api/', include(router.urls)),
+    path("api/sections/<int:area_id>/", views_html.api_sections, name="api_sections"),
+    path("api/section/<int:section_id>/", views_html.api_section_details, name="api_section_details"),
+    path("ajax/load-areas/", views_html.load_areas, name="ajax_load_areas"),
+    path("ajax/load-sections/", views_html.load_sections, name="ajax_load_sections"),
 ]
-
-
-
-   
- 
-
-

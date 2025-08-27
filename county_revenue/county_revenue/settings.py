@@ -26,7 +26,6 @@ SECRET_KEY = 'django-insecure-d^ml$y)ka-@4@67x77uwpn7o45sa@-markfwjv-u(vwn!o^#a=
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -39,9 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'revenue',
+    'revenue.apps.RevenueConfig',  # changed here
     'users',
+    'widget_tweaks',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,10 +125,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Africa/Nairobi'  # Kenya timezone (UTC+3)
 USE_I18N = True
-
 USE_TZ = True
 
 

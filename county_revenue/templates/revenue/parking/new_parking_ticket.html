@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8">
@@ -9,49 +10,65 @@
         {% csrf_token %}
 
         <!-- Auto-filled details -->
-        <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
+        <div class="bg-gray-100 p-4 rounded-lg shadow-sm space-y-1">
             <p><span class="font-semibold text-gray-700">Town:</span> {{ town.name }}</p>
             <p><span class="font-semibold text-gray-700">Area:</span> {{ area.name }}</p>
+            <p><span class="font-semibold text-gray-700">Section:</span> {{ section.name }}</p>
         </div>
 
-        <!-- Render form fields from ParkingTicketForm -->
-        <div>
+        <!-- Form non-field errors -->
+        {% if form.non_field_errors %}
+        <div class="bg-red-100 text-red-700 p-3 rounded-lg">
             {{ form.non_field_errors }}
         </div>
+        {% endif %}
 
         <div class="space-y-4">
+            <!-- Plate Number -->
             <div>
-                {{ form.vehicle.label_tag }}
-                {{ form.vehicle }}
-                {{ form.vehicle.errors }}
+                {{ form.plate_number.label_tag }}
+                {{ form.plate_number|add_class:"w-full border-gray-300 rounded-lg p-2" }}
+                {% for error in form.plate_number.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
             </div>
 
+            <!-- Vehicle Type -->
             <div>
-                {{ form.section.label_tag }}
-                {{ form.section }}
-                {{ form.section.errors }}
+                {{ form.vehicle_type.label_tag }}
+                {{ form.vehicle_type|add_class:"w-full border-gray-300 rounded-lg p-2" }}
+                {% for error in form.vehicle_type.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
             </div>
 
-            <div>
-                {{ form.custom_section_name.label_tag }}
-                {{ form.custom_section_name }}
-                {{ form.custom_section_name.errors }}
-            </div>
-
+            <!-- Duration and Time Unit -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     {{ form.duration.label_tag }}
-                    {{ form.duration }}
-                    {{ form.duration.errors }}
+                    {{ form.duration|add_class:"w-full border-gray-300 rounded-lg p-2" }}
+                    {% for error in form.duration.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                    {% endfor %}
                 </div>
 
                 <div>
                     {{ form.time_unit.label_tag }}
-                    {{ form.time_unit }}
-                    {{ form.time_unit.errors }}
+                    {{ form.time_unit|add_class:"w-full border-gray-300 rounded-lg p-2" }}
+                    {% for error in form.time_unit.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                    {% endfor %}
                 </div>
             </div>
-        </div>
+
+            <!-- Custom Place -->
+            <div>
+                {{ form.custom_place.label_tag }}
+                {{ form.custom_place|add_class:"w-full border-gray-300 rounded-lg p-2" }}
+                {% for error in form.custom_place.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
 
         <!-- Submit Button -->
         <div>

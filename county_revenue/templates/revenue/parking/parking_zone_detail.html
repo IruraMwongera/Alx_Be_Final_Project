@@ -2,44 +2,36 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>{{ zone.name }}</h2>
-    <p><strong>Location:</strong> {{ zone.location }}</p>
-    <p><strong>Capacity:</strong> {{ zone.capacity }} vehicles</p>
-
-    <h5 class="mt-3">Rates (Per Day):</h5>
-    <ul>
-        <li>Saloon Car: Ksh 300</li>
-        <li>Van: Ksh 500</li>
-        <li>Bus / Small Lorries: Ksh 1000</li>
-        <li>Tankers / Trucks: Ksh 1500</li>
-    </ul>
+    <h2>Parking Zone: {{ zone.name }}</h2>
+    <p><strong>Town:</strong> {{ zone.town}}</p> <br>
+    <p><strong>area:</strong> {{ zone.area }}</p>
 
     <hr>
 
-    <h4>Create Parking Ticket</h4>
-    <a href="{% url 'create_parking_ticket' zone.id %}" class="btn btn-success">
-        New Parking Ticket
-    </a>
-
-    <hr>
-
-    <h4>My Tickets in this Zone</h4>
-    <ul>
-        {% for ticket in tickets %}
-            <li>
-                <a href="{% url 'parking_ticket_detail' ticket.id %}">
-                    {{ ticket.vehicle }} — {{ ticket.duration }} {{ ticket.time_unit }}
-                    {% if ticket.paid %}(Paid){% else %}(Unpaid){% endif %}
-                </a>
-            </li>
-        {% empty %}
-            <li>You have no tickets in this zone yet.</li>
-        {% endfor %}
-    </ul>
-
-    <hr>
-    {% if ticket.pk %}
-    <a href="{% url 'parking_ticket_detail_view' ticket.pk %}" class="btn btn-sm btn-primary">View</a>
+    <h3>Sections in this Zone</h3>
+    {% if sections %}
+        <ul class="list-group">
+            {% for section in sections %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ section.name }}</strong>
+                        <br>
+                        <small>Capacity: {{ section.capacity }}</small>
+                    </div>
+                    <div>
+                        <!-- Correct button: passes section.id -->
+                        <a href="{% url 'create_ticket' section.id %}" class="btn btn-sm btn-primary">
+                            New Parking Ticket
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No sections available for this zone.</p>
     {% endif %}
+
+    <hr>
+    <a href="{% url 'parking_zones' %}" class="btn btn-secondary">Back to Zones</a>
 </div>
 {% endblock %}

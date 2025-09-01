@@ -1,0 +1,66 @@
+Registration
+
+http://127.0.0.1:8000/api/users/
+
+
+{
+  "username": "Mwongera",
+  "email": "irura.mwongera11@gmail.com",
+  "password": "Jack1234",
+  "first_name": "Irura",
+  "last_name": "Mwong",
+  "NATIONAL_ID": "12345678",
+  "phone": "0712345678"
+}
+
+
+
+http://127.0.0.1:8000/api/login/
+
+
+{
+  "username": "Mwongera",
+  "password": "Jack1234"
+}
+
+
+
+Sample POST request for permit
+
+POST http://127.0.0.1:8000/api/permits/
+
+
+3️⃣ Summary
+Permit Type	ID	Required field
+Large Business	1	None (yearly)
+Small Business	2	None (yearly)
+Market Stall	3	None (yearly)
+Hawking (monthly)	4	duration_months
+Alcohol Special Event	5	duration_days
+
+
+
+
+{
+ "permit_type": 1,
+}
+
+{
+ "permit_type": 2,
+}
+{
+ "permit_type": 3,
+}
+{
+  "permit_type": 4,
+  "duration_months": 2
+}
+
+{
+  "permit_type": 5,
+  "duration_days": 3
+}
+
+Get http://127.0.0.1:8000/api/permits/
+
+

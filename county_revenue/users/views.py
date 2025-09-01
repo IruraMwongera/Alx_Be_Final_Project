@@ -1,16 +1,16 @@
-from django.shortcuts import render, redirect
-from rest_framework import viewsets, permissions
 from django.contrib.auth import get_user_model, authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
-from django import forms
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+
 from .serializers import UserSerializer
 
 User = get_user_model()
 
+
 # -----------------------------
-# DRF API ViewSet
+# DRF User ViewSet
 # -----------------------------
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -31,65 +31,62 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        # Admins see all, others only see themselves
+        # Admins see all users, regular users only see themselves
         if self.request.user.is_staff or getattr(self.request.user, 'role', '') == 'admin':
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
 
 
 # -----------------------------
-# HTML Views
+# Auth Endpoints
 # -----------------------------
-class RegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, label="Password")
-    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
 
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'NATIONAL_ID', 'phone', 'role', 'password']
+class RegisterAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data.get('password') != cleaned_data.get('confirm_password'):
-            raise forms.ValidationError("Passwords do not match.")
-        return cleaned_data
-
-
-def register_view(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            user.set_password(request.data.get("password"))
             user.save()
-            messages.success(request, "Account created successfully. Please log in.")
-            return redirect('login')
-    else:
-        form = RegisterForm()
-    return render(request, 'users/register.html', {'form': form})
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                "message": "Account created successfully",
+                "token": token.key
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            login(request, form.get_user())
-            messages.success(request, "Welcome back!")
-            return redirect('profile')
-        else:
-            messages.error(request, "Invalid username or password.")
-    else:
-        form = AuthenticationForm()
-    return render(request, 'users/login.html', {'form': form})
+class LoginAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                "message": "Login successful",
+                "token": token.key
+            })
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-def logout_view(request):
-    logout(request)
-    messages.info(request, "You have been logged out.")
-    return redirect('login')
+class LogoutAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()  # remove token
+        logout(request)
+        return Response({"message": "Logged out successfully"})
 
 
-@login_required
-def profile_view(request):
-    return render(request, 'users/profile.html')
+class ProfileAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

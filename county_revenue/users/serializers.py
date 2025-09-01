@@ -4,18 +4,25 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'NATIONAL_ID', 'phone', 'role', 'password']
-        read_only_fields = ['id', 'role']  # role can be admin-only to set
+        fields = [
+            'id', 'username', 'email',
+            'first_name', 'last_name',
+            'NATIONAL_ID', 'phone', 'role', 'password'
+        ]
+        read_only_fields = ['id', 'role']
+        extra_kwargs = {
+            'email': {'required': True},
+            'username': {'required': True},
+        }
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
+        password = validated_data.pop('password')
         user = User(**validated_data)
-        if password:
-            user.set_password(password)
+        user.set_password(password)
         user.save()
         return user
 
